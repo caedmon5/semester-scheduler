@@ -1,5 +1,10 @@
+# ignore the following
 *.pyc\n__pycache__/
 schedules/private.py
 *.ics
+
+# ignore everyting in schedules/private
 schedules/private/*
+# except the following (required for documentation)
 !schedules/private/.gitkeep
+!schedules/private/README.md
