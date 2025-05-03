@@ -1,123 +1,84 @@
-# Semester Scheduler
+# 📆 Semester Scheduler
 
-Generate `.ics` calendar files from structured weekly routines. Designed for academics or professionals who work in recurring cycles (e.g. teaching semesters, writing blocks, supervision, or admin).
-
-This project supports modular calendar planning with reusable schedule definitions for each semester.
-
-## 🔐 Privacy Best Practices
-
-We strongly recommend:
-
-- Storing your real schedule in `schedules/private.py`
-- Adding `schedules/private.py` and `*.ics` to your `.gitignore`
-- Never committing actual calendar files or personal data
+Generate `.ics` calendar files from structured weekly schedule templates. Designed to support academic planning for teaching, research, and admin tasks across terms.
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Install requirements
+Generate a calendar:
 
 ```bash
-pip install icalendar
+python generate_schedule.py --source fall2025 --output data/fall_schedule.ics --start 2025-09-01 --end 2025-12-15
 ```
 
-### 2. Generate a calendar
-
-```bash
-python generate_schedule.py --semester summer --output summer2025.ics
-```
-
-This will create a calendar file based on the summer schedule defined in `schedules/model.py`.
+- `--source` refers to a file like `schedules/private/fall2025.py`
+- `--output` is the destination `.ics` file
+- `--start` and `--end` set the date range (defaults: May–August)
 
 ---
 
-## 📁 Project Structure
+## 📁 Directory Structure
 
-```text
-semester-scheduler/
-├── generate_schedule.py         # CLI entry point
-├── schedules/
-│   ├── model.py                 # Sample weekly schedule (template)
-│   └── private.py (ignored)     # Optional personal schedule
-├── utils/
-│   └── icalendar_helpers.py     # Event logic
-├── data/
-│   └── output/                  # ICS files (optional)
-├── .gitignore
-└── README.md
 ```
+schedules/
+├── model.py            # Public sample
+└── private/
+    ├── .gitkeep
+    ├── README.md       # Instructions for private use
+    ├── summer2025.py   # User-defined, git-ignored
+    └── fall2025.py
 
----
+data/
+├── .gitkeep
+└── README.md           # Calendar outputs (git-ignored)
 
-## 🧩 Using Your Own Schedule
-
-The default configuration uses `schedules/model.py`.
-
-To customize:
-
-1. Copy the template:
-
-    ```bash
-    cp schedules/model.py schedules/private.py
-    ```
-
-2. Open `generate_schedule.py` and replace:
-
-    ```python
-    from schedules.model import schedule
-    ```
-
-    with:
-
-    ```python
-    from schedules.private import schedule
-    ```
-
-3. Edit `schedules/private.py` with your real schedule.
-
-We recommend adding this line to `.gitignore`:
-
-```gitignore
-schedules/private.py
+utils/
+└── icalendar_helpers.py
 ```
 
 ---
 
-## 📅 Event Format
+## 📐 Schedule Format
 
-Each schedule is a list of 5-tuples:
+Each schedule file defines a list of tuples like this:
 
 ```python
-("Label", day_of_week, start_time, end_time, is_busy)
+from datetime import time
+
+schedule = [
+    ("ENGL 3450A", 0, time(9, 0), time(9, 50), True, "teaching", False),
+    ("Writing", 1, time(10, 0), time(12, 0), True, "research", False),
+    ("Therapy", 3, time(14, 0), time(15, 0), True, "personal", True),
+]
 ```
 
-Where:
-- `day_of_week`: 0 = Monday, ..., 6 = Sunday
-- `is_busy`: if `True`, event blocks availability (shown as busy)
+Tuple fields:
+1. `summary` (str) — Event label
+2. `weekday` (int) — 0=Mon ... 6=Sun
+3. `start_time` (datetime.time)
+4. `end_time` (datetime.time)
+5. `is_busy` (bool)
+6. `category` (str, optional)
+7. `is_private` (bool, optional)
 
-Example:
-
-```python
-("Writing", 1, time(9, 0), time(11, 0), True)
-```
-
----
-
-## 🛠️ Roadmap
-
-- [ ] Add support for biweekly events
-- [ ] Export Google Calendar import instructions
-- [ ] Support for holidays and exceptions
+Only the first 5 fields are required. Additional metadata is optional.
 
 ---
 
-## 📝 License
+## 🔐 Privacy Guidelines
 
-MIT License (see LICENSE file)
+- `schedules/private/` is git-ignored by default
+- `.ics` files are not tracked either
+- You may add `.gitkeep` and `README.md` to preserve folder visibility
+
+Do **not** commit real schedules or calendar exports.
 
 ---
 
-## 👤 Maintainer
+## 🧩 Modular & Reusable
 
-[caedmon5](https://github.com/caedmon5)
+This system is designed for easy reuse:
+- Add or modify schedule files per semester
+- Swap source files without changing your generator
+- Use categories for future visualizations or filtered exports
