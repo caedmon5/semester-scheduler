@@ -1,6 +1,8 @@
 # ignore the following
 *.pyc\n__pycache__/
 schedules/private.py
+
+# ignore all output calendars wherever they appear
 *.ics
 
 # ignore everyting in schedules/private
@@ -8,3 +10,8 @@ schedules/private/*
 # except the following (required for documentation)
 !schedules/private/.gitkeep
 !schedules/private/README.md
+
+# ignore all information in data/ except for the .gitkeep and README.md
+data/*
+!data/README.md
+!data/.gitkeep
