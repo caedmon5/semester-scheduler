@@ -18,8 +18,15 @@ def add_recurring_event(cal, summary, start_time_str, end_time_str, day, start_d
         raise ValueError(f"Invalid day format: {day}")
 
     # Parse times
-    start_time = datetime.strptime(start_time_str, "%H:%M").time()
-    end_time = datetime.strptime(end_time_str, "%H:%M").time()
+    if isinstance(start_time_str, str):
+        start_time = datetime.strptime(start_time_str, "%H:%M").time()
+    else:
+        start_time = start_time_str
+
+    if isinstance(end_time_str, str):
+        end_time = datetime.strptime(end_time_str, "%H:%M").time()
+    else:
+        end_time = end_time_str
 
     # Find first occurrence of the correct day
     current = start_date
