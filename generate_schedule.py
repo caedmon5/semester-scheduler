@@ -29,15 +29,22 @@ def main():
             summary, day, start_time, end_time, is_busy = entry
             category = None
             is_private = False
+            rrule = None
         elif len(entry) == 6:
             summary, day, start_time, end_time, is_busy, category = entry
             is_private = False
+            rrule = None
         elif len(entry) == 7:
             summary, day, start_time, end_time, is_busy, category, is_private = entry
+            rrule = None
+        elif len(entry) == 8:
+            summary, day, start_time, end_time, is_busy, category, is_private, rrule = entry
         else:
             raise ValueError(f"Invalid schedule entry length: {len(entry)} fields")
 
-        add_recurring_event(cal, summary, start_time, end_time, day, start_date, end_date, is_busy, category, is_private)
+        add_recurring_event(cal, summary, start_time, end_time, day, start_date, end_date,
+                            is_busy, category, is_private, rrule)
+
 
     with open(args.output, 'wb') as f:
         f.write(cal.to_ical())

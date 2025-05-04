@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from icalendar import Event
 
 def add_recurring_event(cal, summary, start_time_str, end_time_str, day, start_date, end_date,
-                         is_busy=True, category=None, is_private=False):
+                         is_busy=True, category=None, is_private=False,rrule=None):
 
     int_to_ical_day = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
 
