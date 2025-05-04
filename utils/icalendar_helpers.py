@@ -3,12 +3,19 @@ from icalendar import Event
 
 def add_recurring_event(cal, summary, start_time_str, end_time_str, day, start_date, end_date,
                          is_busy=True, category=None, is_private=False):
-    day_map = {
-        "MO": 0, "TU": 1, "WE": 2, "TH": 3, "FR": 4, "SA": 5, "SU": 6
-    }
 
-    if day not in day_map:
-        raise ValueError(f"Invalid day: {day}")
+    int_to_ical_day = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
+
+    # Normalize `day` to iCalendar format
+    if isinstance(day, int):
+        try:
+            ical_day = int_to_ical_day[day]
+        except IndexError:
+            raise ValueError(f"Invalid numeric day: {day}")
+    elif isinstance(day, str) and day in int_to_ical_day:
+        ical_day = day
+    else:
+        raise ValueError(f"Invalid day format: {day}")
 
     # Parse times
     start_time = datetime.strptime(start_time_str, "%H:%M").time()
@@ -25,6 +32,7 @@ def add_recurring_event(cal, summary, start_time_str, end_time_str, day, start_d
     event.add("dtend", datetime.combine(current, end_time))
     event.add("rrule", {
         "freq": "weekly",
+        "byday": ical_day,
         "until": datetime.combine(end_date, end_time)
     })
 
