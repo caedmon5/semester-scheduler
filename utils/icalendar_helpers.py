@@ -29,8 +29,9 @@ def add_recurring_event(cal, summary, start_time_str, end_time_str, day, start_d
         end_time = end_time_str
 
     # Find first occurrence of the correct day
+    target_weekday = int_to_ical_day.index(ical_day)
     current = start_date
-    while current.weekday() != day_map[day]:
+    while current.weekday() != target_weekday:
         current += timedelta(days=1)
 
     event = Event()
