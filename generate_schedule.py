@@ -24,8 +24,20 @@ def main():
     cal.add('prodid', '-//Semester Scheduler//')
     cal.add('version', '2.0')
 
-    for summary, day, start_time, end_time, is_busy, *_ in schedule:
-        add_recurring_event(cal, summary, start_time, end_time, day, start_date, end_date, is_busy)
+    for entry in schedule:
+        if len(entry) == 5:
+            summary, day, start_time, end_time, is_busy = entry
+            category = None
+            is_private = False
+        elif len(entry) == 6:
+            summary, day, start_time, end_time, is_busy, category = entry
+            is_private = False
+        elif len(entry) == 7:
+            summary, day, start_time, end_time, is_busy, category, is_private = entry
+        else:
+            raise ValueError(f"Invalid schedule entry length: {len(entry)} fields")
+
+        add_recurring_event(cal, summary, start_time, end_time, day, start_date, end_date, is_busy, category, is_private)
 
     with open(args.output, 'wb') as f:
         f.write(cal.to_ical())

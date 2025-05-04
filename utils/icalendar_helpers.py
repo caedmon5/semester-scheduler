@@ -1,47 +1,41 @@
-# utils/icalendar_helpers.py
 from datetime import datetime, timedelta
 from icalendar import Event
 
-def add_recurring_event(calendar, summary, start_time, end_time, weekday,
-                        start_date, end_date, is_busy,
-                        category=None, is_private=False):
-    """
-    Adds weekly recurring events to the calendar between start_date and end_date.
+def add_recurring_event(cal, summary, start_time_str, end_time_str, day, start_date, end_date,
+                         is_busy=True, category=None, is_private=False):
+    day_map = {
+        "MO": 0, "TU": 1, "WE": 2, "TH": 3, "FR": 4, "SA": 5, "SU": 6
+    }
 
-    Args:
-        calendar: The icalendar.Calendar object to update.
-        summary (str): The event title.
-        start_time (datetime.time): Start time of the event.
-        end_time (datetime.time): End time of the event.
-        weekday (int): Day of the week (0=Monday ... 6=Sunday).
-        start_date (datetime.date): First date to include.
-        end_date (datetime.date): Last date to include.
-        is_busy (bool): Whether to mark the time as busy.
-        category (str or None): Optional category (e.g., "admin", "teaching").
-        is_private (bool): Whether to add CLASS:PRIVATE to the event.
-    """
+    if day not in day_map:
+        raise ValueError(f"Invalid day: {day}")
+
+    # Parse times
+    start_time = datetime.strptime(start_time_str, "%H:%M").time()
+    end_time = datetime.strptime(end_time_str, "%H:%M").time()
+
+    # Find first occurrence of the correct day
     current = start_date
-    while current.weekday() != weekday:
+    while current.weekday() != day_map[day]:
         current += timedelta(days=1)
 
-    while current <= end_date:
-        event = Event()
-        start_dt = datetime.combine(current, start_time)
-        end_dt = datetime.combine(current, end_time)
-        event.add('dtstart', start_dt)
-        event.add('dtend', end_dt)
-        event.add('summary', summary)
+    event = Event()
+    event.add("summary", summary)
+    event.add("dtstart", datetime.combine(current, start_time))
+    event.add("dtend", datetime.combine(current, end_time))
+    event.add("rrule", {
+        "freq": "weekly",
+        "until": datetime.combine(end_date, end_time)
+    })
 
-        if is_busy:
-            event.add('transp', 'OPAQUE')  # block time
-        else:
-            event.add('transp', 'TRANSPARENT')  # free time
+    if is_busy:
+        event.add("transp", "OPAQUE")
+    else:
+        event.add("transp", "TRANSPARENT")
 
-        if is_private:
-            event.add('class', 'PRIVATE')
+    if category:
+        event.add("categories", category)
+    if is_private:
+        event.add("class", "PRIVATE")
 
-        if category:
-            event.add('categories', category)
-
-        calendar.add_component(event)
-        current += timedelta(days=7)
+    cal.add_component(event)

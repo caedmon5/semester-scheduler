@@ -1,84 +1,49 @@
-# 📆 Semester Scheduler
+## 📅 Generating a Schedule
 
-Generate `.ics` calendar files from structured weekly schedule templates. Designed to support academic planning for teaching, research, and admin tasks across terms.
-
----
-
-## 🚀 Quick Start
-
-Generate a calendar:
+To generate a `.ics` calendar file from a semester schedule, use:
 
 ```bash
-python generate_schedule.py --source fall2025 --output data/fall_schedule.ics --start 2025-09-01 --end 2025-12-15
+python generate_schedule.py --source summer2025 --output data/summer2025.ics --start 2025-05-01 --end 2025-08-30
 ```
 
-- `--source` refers to a file like `schedules/private/fall2025.py`
-- `--output` is the destination `.ics` file
-- `--start` and `--end` set the date range (defaults: May–August)
+### 🧾 Arguments
+
+| Argument       | Required | Description                                                                 |
+|----------------|----------|-----------------------------------------------------------------------------|
+| `--source`     | No       | The name of the schedule module (default: `summer2025`).                    |
+| `--output`     | Yes      | Path where the `.ics` file should be saved.                                 |
+| `--start`      | No       | Start date for recurring events (default set by `load_schedule.py`).        |
+| `--end`        | No       | End date for recurring events (default set by `load_schedule.py`).          |
 
 ---
 
-## 📁 Directory Structure
+### 🗂 Schedule Source Files
+
+Place your structured weekly schedule tuples in:
 
 ```
-schedules/
-├── model.py            # Public sample
-└── private/
-    ├── .gitkeep
-    ├── README.md       # Instructions for private use
-    ├── summer2025.py   # User-defined, git-ignored
-    └── fall2025.py
-
-data/
-├── .gitkeep
-└── README.md           # Calendar outputs (git-ignored)
-
-utils/
-└── icalendar_helpers.py
+schedules/private/summer2025.py
+schedules/private/fall2025.py
 ```
 
----
-
-## 📐 Schedule Format
-
-Each schedule file defines a list of tuples like this:
+Each file should define a `schedule` list in this format:
 
 ```python
 from datetime import time
 
 schedule = [
-    ("ENGL 3450A", 0, time(9, 0), time(9, 50), True, "teaching", False),
-    ("Writing", 1, time(10, 0), time(12, 0), True, "research", False),
-    ("Therapy", 3, time(14, 0), time(15, 0), True, "personal", True),
+    ("Event Title", weekday, start_time, end_time, is_busy, category, is_private),
 ]
 ```
 
-Tuple fields:
-1. `summary` (str) — Event label
-2. `weekday` (int) — 0=Mon ... 6=Sun
-3. `start_time` (datetime.time)
-4. `end_time` (datetime.time)
-5. `is_busy` (bool)
-6. `category` (str, optional)
-7. `is_private` (bool, optional)
-
-Only the first 5 fields are required. Additional metadata is optional.
-
 ---
 
-## 🔐 Privacy Guidelines
+### 🔁 Customizing Sources
 
-- `schedules/private/` is git-ignored by default
-- `.ics` files are not tracked either
-- You may add `.gitkeep` and `README.md` to preserve folder visibility
+To add a new schedule module (e.g., `spring2026.py`), create it in `schedules/private/`, then update `load_schedule.py`:
 
-Do **not** commit real schedules or calendar exports.
-
----
-
-## 🧩 Modular & Reusable
-
-This system is designed for easy reuse:
-- Add or modify schedule files per semester
-- Swap source files without changing your generator
-- Use categories for future visualizations or filtered exports
+```python
+elif source == "spring2026":
+    from schedules.private import spring2026 as module
+    return module.schedule, date(2026, 1, 1), date(2026, 4, 30)
+```
